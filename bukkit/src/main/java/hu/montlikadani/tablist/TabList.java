@@ -1,6 +1,7 @@
 package hu.montlikadani.tablist;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import hu.montlikadani.tablist.api.TabListAPI;
+import hu.montlikadani.tablist.config.FakeConfiguration;
+import hu.montlikadani.tablist.listeners.FakeListeners;
 import hu.montlikadani.tablist.tablist.TabToggleBase;
 import hu.montlikadani.tablist.utils.Util;
 import hu.montlikadani.tablist.utils.scheduler.TLScheduler;
@@ -45,6 +48,7 @@ public final class TabList extends org.bukkit.plugin.java.JavaPlugin {
 	private transient Variables variables;
 	private transient Groups groups;
 	private transient Configuration conf;
+	private transient FakeConfiguration fakeConf;
 	private transient TabManager tabManager;
 	private transient FakePlayerHandler fakePlayerHandler;
 	private transient Complement complement;
@@ -75,6 +79,10 @@ public final class TabList extends org.bukkit.plugin.java.JavaPlugin {
 		variables = new Variables(this);
 		tabManager = new TabManager(this);
 		fakePlayerHandler = new FakePlayerHandler(this);
+		try {
+			fakeConf = new FakeConfiguration(this);
+		} catch (IOException ex) { ex.printStackTrace(); }
+
 
 		// Load static references
 		try {
@@ -268,6 +276,7 @@ public final class TabList extends org.bukkit.plugin.java.JavaPlugin {
 		HandlerList.unregisterAll(this);
 
 		getServer().getPluginManager().registerEvents(new Listeners(this), this);
+		getServer().getPluginManager().registerEvents(new FakeListeners(this), this);
 
 		if (ConfigValues.isAfkStatusEnabled() || ConfigValues.isHidePlayerFromTabAfk()) {
 			if (isPluginEnabled("Essentials")) {
@@ -297,6 +306,9 @@ public final class TabList extends org.bukkit.plugin.java.JavaPlugin {
 
 		loadListeners();
 		conf.loadFiles();
+		try {
+			fakeConf.loadFiles();
+		} catch (IOException ex) { ex.printStackTrace(); }
 		loadAnimations();
 		loadPacketListener();
 		variables.load();
@@ -535,6 +547,10 @@ public final class TabList extends org.bukkit.plugin.java.JavaPlugin {
 
 	public Configuration getConf() {
 		return conf;
+	}
+
+	public FakeConfiguration getFakeConf() {
+		return fakeConf;
 	}
 
 	public PermissionService getPermissionService() {

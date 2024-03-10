@@ -9,16 +9,16 @@ java {
 }
 
 repositories {
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://repo.codemc.org/repository/nms/")
     maven("https://libraries.minecraft.net/")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://oss.sonatype.org/content/groups/public/") // Netty
 }
 
 dependencies {
     api(project(":api"))
 
-    compileOnly("org.spigotmc:spigot:1.20.4-R0.1-SNAPSHOT") {
+    compileOnly("org.spigotmc:spigot:1.20.4-R0.1-20240222.090848-25") {
         exclude("org.yaml", "snakeyaml")
     }
 
